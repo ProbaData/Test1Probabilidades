@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta</title>
+    <style>
+        /* Agrega estilos básicos para ocultar y mostrar paneles */
+        .panel {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="inicio">
+        <h1>Selecciona tu rol</h1>
+        <button onclick="mostrarPanel('alumno')">Iniciar sesión como alumno</button>
+        <button onclick="mostrarPanel('pin')">Iniciar sesión como profesor</button>
+    </div>
+
+    <div id="pinPanel" class="panel">
+        <h1>Inicio de sesión del Profesor</h1>
+        <form id="pinForm">
+            <label for="pinInput">Ingresa el PIN:</label>
+            <input type="password" id="pinInput" required>
+            <button type="submit">Enviar</button>
+        </form>
+        <p id="pinError" style="color: red; display: none;">PIN incorrecto. Intenta de nuevo.</p>
+    </div>
+
+    <div id="alumnoPanel" class="panel">
+        <h1>Encuesta para Alumnos</h1>
+        <div id="preguntaInicial">
+            <p>¿Voy al día con la materia?</p>
+            <button onclick="guardarRespuestaAlumno('Sí', true)">Sí</button>
+            <button onclick="guardarRespuestaAlumno('No', false)">No</button>
+        </div>
+        <div id="preguntaProfesorPanel" style="display:none;">
+            <h2>Pregunta del profesor:</h2>
+            <p id="preguntaProfesor"></p>
+            <button onclick="guardarRespuestaAlumno('Sí', true)">Sí</button>
+            <button onclick="guardarRespuestaAlumno('No', false)">No</button>
+        </div>
+    </div>
+
+    <div id="profesorPanel" class="panel">
+        <h1>Encuesta para Profesores</h1>
+        <form id="formPregunta">
+            <label for="preguntaInput">Escribe tu pregunta:</label>
+            <input type="text" id="preguntaInput" required>
+            <button type="submit">Enviar Pregunta</button>
+        </form>
+
+        <h2>Resultados:</h2>
+        <div>
+            <p>Total de "Sí": <span id="totalSi">0</span></p>
+            <p>Total de "No": <span id="totalNo">0</span></p>
+            <p>"Sí" al día con la materia: <span id="siAlDia">0</span></p>
+            <p>"No" al día con la materia: <span id="noAlDia">0</span></p>
+            <p>"Sí" no al día con la materia: <span id="siNoAlDia">0</span></p>
+            <p>"No" no al día con la materia: <span id="noNoAlDia">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        const CORRECT_PIN = '1234'; // Cambia esto por el PIN que desees
+
+        // Función para mostrar el panel correspondiente
+        function mostrarPanel(panel) {
+            document.getElementById('inicio').style.display = 'none';
+            document.getElementById('pinPanel').style.display = 'none';
+            document.getElementById('alumnoPanel').style.display = 'none';
+            document.getElementById('profesorPanel').style.display = 'none';
+
+            if (panel === 'alumno') {
+                document.getElementById('alumnoPanel').style.display = 'block';
+                mostrarPreguntaProfesor();
+            } else if (panel === 'pin') {
+                document.getElementById('pinPanel').style.display = 'block';
+            } else if (panel === 'profesor') {
+                document.getElementById('profesorPanel').style.display = 'block';
+                contarRespuestas();
+                setInterval(contarRespuestas, 5000); // Actualizar cada 5 segundos
+            }
+        }
+
+        // Función para verificar el PIN
+        function verificarPin(event) {
+            event.preventDefault();
+            const pinInput = document.getElementById('pinInput').value;
+            if (pinInput === CORRECT_PIN) {
+                document.getElementById('pinPanel').style.display = 'none';
+                mostrarPanel('profesor');
+            } else {
+                document.getElementById('pinError').style.display = 'block';
+            }
+        }
+
+        // Función para guardar la respuesta del alumno
+        function guardarRespuestaAlumno(respuesta, alDia) {
+            // Aquí agregaríamos el código para guardar la respuesta en Firebase
+            console.log(`Respuesta guardada: ${respuesta}, Al día: ${alDia}`);
+
+            if (document.getElementById('preguntaInicial').style.display !== 'none') {
+                // Ocultar la pregunta inicial y mostrar la pregunta del profesor
+                document.getElementById('preguntaInicial').style.display = 'none';
+                document.getElementById('preguntaProfesorPanel').style.display = 'block';
+                // Guardar la respuesta del alumno
+                guardarRespuestaEnFirebase(respuesta, alDia);
+            } else {
+                // Guardar la respuesta del alumno a la pregunta del profesor
+                guardarRespuestaEnFirebase(respuesta, alDia);
+            }
+        }
+
+        // Función para mostrar la pregunta del profesor
+        function mostrarPreguntaProfesor() {
+            const preguntaProfesorElement = document.getElementById('preguntaProfesor');
+            // Aquí obtendremos la pregunta del profesor desde Firebase y la mostraremos
+            preguntaProfesorElement.textContent = "Pregunta de prueba del profesor";
+        }
+
+        // Función mock para guardar respuestas en Firebase
+        function guardarRespuestaEnFirebase(respuesta, alDia) {
+            console.log(`Guardando respuesta en Firebase: ${respuesta}, Al día: ${alDia}`);
+            // Código para guardar en Firebase
+        }
+
+        // Función para contar respuestas
+        function contarRespuestas() {
+            console.log("Contando respuestas...");
+            // Aquí contaremos las respuestas desde Firebase
+        }
+
+        // Manejo del formulario de la pregunta del profesor
+        document.getElementById('formPregunta').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const pregunta = document.getElementById('preguntaInput').value;
+            guardarPreguntaProfesor(pregunta);
+            document.getElementById('preguntaInput').value = '';
+        });
+
+        // Función mock para guardar la pregunta del profesor
+        function guardarPreguntaProfesor(pregunta) {
+            console.log(`Pregunta guardada: ${pregunta}`);
+            // Código para guardar la pregunta en Firebase
+        }
+
+        // Agregar manejador de eventos para el formulario de PIN
+        document.getElementById('pinForm').addEventListener('submit', verificarPin);
+    </script>
+</body>
+</html>
